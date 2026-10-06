@@ -29,6 +29,9 @@ jobs:
           days-before-issue-stale: -1 # Prevents adding any other stale label
           days-before-issue-close: 14  # Closes 14 day after the label was added with no activity
 
+          # Do not remove the stale label on updates; unlabeling is handled by needinfo-reply workflow
+          remove-issue-stale-when-updated: false
+
           # Prevents PRs from being processed or closed
           days-before-pr-stale: -1
           days-before-pr-close: -1

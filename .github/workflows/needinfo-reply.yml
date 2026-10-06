@@ -1,0 +1,45 @@
+name: Remove NEEDSINFO on Author Reply
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  remove-needsinfo:
+    name: Remove NEEDSINFO label
+    runs-on: ubuntu-slim
+    if: >
+      github.repository == 'ublue-os/aurora' &&
+      !github.event.issue.pull_request &&
+      github.event.issue.user &&
+      github.event.comment.user.login == github.event.issue.user.login
+    permissions:
+      issues: write
+    steps:
+      - name: Check and remove NEEDSINFO label
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const labels = context.payload.issue.labels || [];
+            const hasNeedsInfo = labels.some(label => label.name === 'NEEDSINFO');
+
+            if (hasNeedsInfo) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name: 'NEEDSINFO'
+                });
+                core.info(`Removed NEEDSINFO label from issue #${issueNumber}`);
+              } catch (error) {
+                core.warning(`Failed to remove label: ${error.message}`);
+              }
+            }
