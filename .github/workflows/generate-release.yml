@@ -35,7 +35,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 500
-          ref: ${{ vars.STABLE_BRANCH }}
 
       - name: Install Just
         run: |
